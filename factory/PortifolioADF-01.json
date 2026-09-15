@@ -1,0 +1,18 @@
+{
+	"name": "PortifolioADF-01",
+	"properties": {
+		"globalConfigurations": {
+			"PipelineBillingEnabled": "true"
+		},
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "65fe9917-91ed-4306-9f54-79df1e3a415f",
+		"tenantId": "751eb400-2c77-4b63-8b54-c59eb3572907"
+	}
+}

@@ -1,0 +1,29 @@
+{
+	"name": "TRG_Blob_Chegada_Arquivo",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_Ingestao_Automatizada",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"Pipeline_FileName": "@triggerBody().fileName",
+					"Pipeline_TableName": "@replace(triggerBody().fileName, '.csv', '')"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/basecop/blobs/",
+			"blobPathEndsWith": ".csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/44a4b05a-c853-486c-9027-1bc9d2ccaad6/resourceGroups/Projeto-01/providers/Microsoft.Storage/storageAccounts/standarts3",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

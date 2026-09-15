@@ -1,0 +1,7 @@
+{
+	"name": "SHIRPostgreSQL",
+	"properties": {
+		"type": "SelfHosted",
+		"description": "SHIR atua como um gateway de integração seguro entre o serviço de nuvem (Azure Data Factory) e o ambiente privado da infraestrutura. Como o banco de dados PostgreSQL está isolado dentro de uma Máquina Virtual (VM) Linux para simular um ambiente corporativo restrito, o ADF não consegue acessá-lo nativamente. O SHIR atua como a ponte de comunicação que resolve essa limitação estrutural."
+	}
+}

@@ -1,0 +1,81 @@
+{
+	"name": "PL_Ingestao_Automatizada",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzurePostgreSqlSink",
+						"writeBatchSize": 1000000,
+						"writeBatchTimeout": "00:30:00",
+						"writeMethod": "CopyCommand"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Blob_CSV",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_file_name": "@pipeline().parameters.Pipeline_FileName"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "PS_PostgreSQL_Sink",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_schema_name": "staging",
+							"p_table_name": {
+								"value": "@pipeline().parameters.Pipeline_TableName",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"Pipeline_FileName": {
+				"type": "string"
+			},
+			"Pipeline_TableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-09-13T04:57:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

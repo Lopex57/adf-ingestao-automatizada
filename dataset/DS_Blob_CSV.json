@@ -1,0 +1,31 @@
+{
+	"name": "DS_Blob_CSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Blob_Bronze",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_file_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "base_cooperativa_credito(cooperados).csv",
+				"folderPath": "standarts3 ",
+				"container": "basecop"
+			},
+			"columnDelimiter": ";",
+			"encodingName": "UTF-8",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
