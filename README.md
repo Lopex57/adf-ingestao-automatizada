@@ -1,0 +1,1 @@
+# adf-ingestao-automatizada
