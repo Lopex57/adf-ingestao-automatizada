@@ -1,0 +1,90 @@
+# 1. Configuração do Provedor (Azure)
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+# 2. Grupo de Recursos (A "Pasta" da sua infra no Azure)
+resource "azurerm_resource_group" "rg_portifolio" {
+  name     = "rg-engenharia-dados-portifolio"
+  location = "East US"
+}
+
+# 3. Azure Data Factory (Já com o seu GitHub configurado!)
+resource "azurerm_data_factory" "adf_portifolio" {
+  name                = "adf-ingestao-automatizada"
+  location            = azurerm_resource_group.rg_portifolio.location
+  resource_group_name = azurerm_resource_group.rg_portifolio.name
+
+  github_configuration {
+    account_name    = "SeuUsuarioGitHub"
+    branch_name     = "main"
+    git_url         = "https://github.com"
+    repository_name = "adf-ingestao-automatizada"
+    root_folder     = "/"
+  }
+}
+
+# 4. Rede Virtual para o Banco de Dados
+resource "azurerm_virtual_network" "vnet_banco" {
+  name                = "vnet-banco-dados"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.rg_portifolio.location
+  resource_group_name = azurerm_resource_group.rg_portifolio.name
+}
+
+resource "azurerm_subnet" "subnet_banco" {
+  name                 = "subnet-postgres"
+  resource_group_name  = azurerm_resource_group.rg_portifolio.name
+  virtual_network_name = azurerm_virtual_network.vnet_banco.name
+  address_prefixes     = ["10.0.2.0/24"]
+}
+
+resource "azurerm_network_interface" "nic_banco" {
+  name                = "nic-postgres-vm"
+  location            = azurerm_resource_group.rg_portifolio.location
+  resource_group_name = azurerm_resource_group.rg_portifolio.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet_banco.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+# 5. Máquina Virtual Linux (Onde o seu PostgreSQL roda)
+resource "azurerm_linux_virtual_machine" "vm_postgres" {
+  name                = "vm-postgres-server"
+  resource_group_name = azurerm_resource_group.rg_portifolio.name
+  location            = azurerm_resource_group.rg_portifolio.location
+  size                = "Standard_B1s"
+  admin_username      = "postgres_admin"
+  network_interface_ids = [
+    azurerm_network_interface.nic_banco.id,
+  ]
+
+  admin_ssh_key {
+    username   = "postgres_admin"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+}
